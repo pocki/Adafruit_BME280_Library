@@ -18,8 +18,8 @@
   in order to work with Particle Photon & Core.
  ***************************************************************************/
 
-#include "Adafruit_BME280/Adafruit_Sensor.h"
-#include "Adafruit_BME280/Adafruit_BME280.h"
+#include "Adafruit_Sensor.h"
+#include "Adafruit_BME280.h"
 
 #define BME_SCK D4
 #define BME_MISO D3
