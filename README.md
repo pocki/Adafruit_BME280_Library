@@ -1,7 +1,7 @@
 Adafruit BME280 Particle Library
 ================================
 
-This is a library for the SparkFun BME280 Humidity, Barometric Pressure + Temp sensor
+This is a library for the Adafruit BME280 Humidity, Barometric Pressure + Temp sensor
 
 Particle Photon, Core & Electorn DHT Library based on Arduino Library for BME280 sensors adapted by Markus Haack
 
