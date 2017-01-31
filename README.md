@@ -14,9 +14,8 @@ These sensors use I2C or SPI to communicate, up to 4 pins are required to interf
 This library allows the user to:
 
 * Read pressure in Pa
-* Read temperature in C & F
+* Read temperature in °C and °F
 * Read humidity in %RH
-* Read temperature in F
 * Read altitude in meters
 * Read altitude in feet
 
