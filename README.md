@@ -19,6 +19,9 @@ This library allows the user to:
 * Read altitude in meters
 * Read altitude in feet
 
+__Hint__: the default I2C address used by the library is (0x77), as in Adafruit_BME280.h. If you sensor board uses a different
+address you can set your own via the .begin(...) method.
+
 Repository Contents
 -------------------
 
@@ -31,6 +34,7 @@ Version History
 * [V_1.0.0](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.0.0) - September 2015 Initial Release
 * [V_1.0.4](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.0.4.particle) - October 2015 pull from Adafruit repo to support multiple sensors with different calibration values
 * [V_1.1.2](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.1.2.particle) - January 2017 migrated to V2 library, pulled minor changes
+* [V_1.1.3](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.1.3.particle) - February 2017 improved documentation
 
 License Information
 -------------------

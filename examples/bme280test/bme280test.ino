@@ -7,6 +7,10 @@
   These sensors use I2C or SPI to communicate, 2 or 4 pins are required
   to interface.
 
+  Hint: the default I2C address used by the library is (0x77), as in
+  Adafruit_BME280.h. If you sensor board uses a different address you
+  can set your own via the .begin(...) method.
+
   Adafruit invests time and resources providing this open source code,
   please support Adafruit andopen-source hardware by purchasing products
   from Adafruit!
@@ -36,6 +40,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println(F("BME280 test"));
 
+  // if (!bme.begin(0x76)) {
   if (!bme.begin()) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
     while (1);
