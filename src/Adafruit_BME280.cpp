@@ -175,10 +175,10 @@ void Adafruit_BME280::write8(byte reg, byte value)
 
 /**************************************************************************/
 /*!
-    @brief  Writes an 8 bit value over I2C or SPI
+    @brief  Read an 8 bit value over I2C or SPI
 */
 /**************************************************************************/
-void Adafruit_BME280::write8(byte reg, byte value) {
+  void Adafruit_BME280::read8(byte reg) {
 
     if (_cs == -1) {
     Wire.beginTransmission((uint8_t)_i2caddr);
@@ -232,7 +232,7 @@ uint8_t Adafruit_BME280::read8(byte reg) {
             SPI.endTransaction(); // release the SPI bus
     }
     return value;
->>>>>>> adafruit/master:Adafruit_BME280.cpp
+
 }
 
 
