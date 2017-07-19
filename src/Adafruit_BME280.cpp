@@ -25,15 +25,15 @@
  PRIVATE FUNCTIONS
  ***************************************************************************/
 Adafruit_BME280::Adafruit_BME280()
-  : _cs(-1), _mosi(-1), _miso(-1), _sck(-1)
+    : _cs(-1), _mosi(-1), _miso(-1), _sck(-1)
 { }
 
 Adafruit_BME280::Adafruit_BME280(int8_t cspin)
-  : _cs(cspin), _mosi(-1), _miso(-1), _sck(-1)
+    : _cs(cspin), _mosi(-1), _miso(-1), _sck(-1)
 { }
 
 Adafruit_BME280::Adafruit_BME280(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin)
-  : _cs(cspin), _mosi(mosipin), _miso(misopin), _sck(sckpin)
+    : _cs(cspin), _mosi(mosipin), _miso(misopin), _sck(sckpin)
 { }
 
 
@@ -44,53 +44,53 @@ Adafruit_BME280::Adafruit_BME280(int8_t cspin, int8_t mosipin, int8_t misopin, i
 /**************************************************************************/
 bool Adafruit_BME280::begin(uint8_t           addr)
 {
-  _i2caddr = addr;
+    _i2caddr = addr;
 
-  // init I2C or SPI sensor interface
-  if (_cs == -1) {
-    // I2C
-    Wire.begin();
-  } else {
-    digitalWrite(_cs, HIGH);
-    pinMode(_cs, OUTPUT);
-    if (_sck == -1) {
-      // hardware SPI
-      SPI.begin();
+    // init I2C or SPI sensor interface
+    if (_cs == -1) {
+        // I2C
+        Wire.begin();
     } else {
-      // software SPI
-      pinMode(_sck, OUTPUT);
-      pinMode(_mosi, OUTPUT);
-      pinMode(_miso, INPUT);
+        digitalWrite(_cs, HIGH);
+        pinMode(_cs, OUTPUT);
+        if (_sck == -1) {
+            // hardware SPI
+            SPI.begin();
+        } else {
+            // software SPI
+            pinMode(_sck, OUTPUT);
+            pinMode(_mosi, OUTPUT);
+            pinMode(_miso, INPUT);
+        }
     }
-  }
 
-  // check if sensor, i.e. the chip ID is correct
-  if (read8(BME280_REGISTER_CHIPID) != 0x60)
-    return false;
+    // check if sensor, i.e. the chip ID is correct
+    if (read8(BME280_REGISTER_CHIPID) != 0x60)
+        return false;
 
-  // reset the device using soft-reset
-  // this makes sure the IIR is off, etc.
-  write8(BME280_REGISTER_SOFTRESET, 0xB6);
+    // reset the device using soft-reset
+    // this makes sure the IIR is off, etc.
+    write8(BME280_REGISTER_SOFTRESET, 0xB6);
 
-  // wait for chip to wake up.
-  delay(300);
+    // wait for chip to wake up.
+    delay(300);
 
-  // if chip is still reading calibration, delay
-  while (isReadingCalibration())
-    delay(100);
+    // if chip is still reading calibration, delay
+    while (isReadingCalibration())
+          delay(100);
 
 
-  readCoefficients(); // read trimming parameters, see DS 4.2.2
+    readCoefficients(); // read trimming parameters, see DS 4.2.2
 
-  setSampling(); // use defaults
+    setSampling(); // use defaults
 
-  return true;
+    return true;
 }
 
 /**************************************************************************/
 /*!
     @brief  setup sensor with given parameters / settings
-
+    
     This is simply a overload to the normal begin()-function, so SPI users
     don't get confused about the library requiring an address.
 */
@@ -98,26 +98,26 @@ bool Adafruit_BME280::begin(uint8_t           addr)
 
 
 void Adafruit_BME280::setSampling(sensor_mode       mode,
-                                  sensor_sampling   tempSampling,
-                                  sensor_sampling   pressSampling,
-                                  sensor_sampling   humSampling,
-                                  sensor_filter     filter,
-                                  standby_duration  duration) {
-  _measReg.mode     = mode;
-  _measReg.osrs_t   = tempSampling;
-  _measReg.osrs_p   = pressSampling;
+		 sensor_sampling   tempSampling,
+		 sensor_sampling   pressSampling,
+		 sensor_sampling   humSampling,
+		 sensor_filter     filter,
+		 standby_duration  duration) {
+    _measReg.mode     = mode;
+    _measReg.osrs_t   = tempSampling;
+    _measReg.osrs_p   = pressSampling;
+        
+    
+    _humReg.osrs_h    = humSampling;
+    _configReg.filter = filter;
+    _configReg.t_sb   = duration;
 
-
-  _humReg.osrs_h    = humSampling;
-  _configReg.filter = filter;
-  _configReg.t_sb   = duration;
-
-
-  // you must make sure to also set REGISTER_CONTROL after setting the
-  // CONTROLHUMID register, otherwise the values won't be applied (see DS 5.4.3)
-  write8(BME280_REGISTER_CONTROLHUMID, _humReg.get());
-  write8(BME280_REGISTER_CONFIG, _configReg.get());
-  write8(BME280_REGISTER_CONTROL, _measReg.get());
+    
+    // you must make sure to also set REGISTER_CONTROL after setting the
+    // CONTROLHUMID register, otherwise the values won't be applied (see DS 5.4.3)
+    write8(BME280_REGISTER_CONTROLHUMID, _humReg.get());
+    write8(BME280_REGISTER_CONFIG, _configReg.get());
+    write8(BME280_REGISTER_CONTROL, _measReg.get());
 }
 
 
@@ -127,29 +127,24 @@ void Adafruit_BME280::setSampling(sensor_mode       mode,
 */
 /**************************************************************************/
 uint8_t Adafruit_BME280::spixfer(uint8_t x) {
-  // hardware SPI
-  if (_sck == -1)
-    return SPI.transfer(x);
+    // hardware SPI
+    if (_sck == -1)
+        return SPI.transfer(x);
 
-  // software SPI
-  uint8_t reply = 0;
-  for (int i=7; i>=0; i--) {
-    reply <<= 1;
-    digitalWrite(_sck, LOW);
-    digitalWrite(_mosi, x & (1<<i));
-    digitalWrite(_sck, HIGH);
-    if (digitalRead(_miso))
-      reply |= 1;
-  }
-  return reply;
+    // software SPI
+    uint8_t reply = 0;
+    for (int i=7; i>=0; i--) {
+        reply <<= 1;
+        digitalWrite(_sck, LOW);
+        digitalWrite(_mosi, x & (1<<i));
+        digitalWrite(_sck, HIGH);
+        if (digitalRead(_miso))
+            reply |= 1;
+    }
+    return reply;
 }
 
-/**************************************************************************/
-/*!
-  @brief  Writes an 8 bit value over I2C or SPI
-*/
 
-/**************************************************************************/
 
 void Adafruit_BME280::write8(byte reg, byte value)
 {
@@ -185,10 +180,10 @@ void Adafruit_BME280::write8(byte reg, byte value)
 /**************************************************************************/
 uint8_t Adafruit_BME280::read8(byte reg)
 {
-  uint8_t value;
+    uint8_t value;
 
 
-  if (_cs == -1) {
+    if (_cs == -1) {
     Wire.beginTransmission((uint8_t)_i2caddr);
     Wire.write((uint8_t)reg);
     Wire.endTransmission();
@@ -255,7 +250,7 @@ uint16_t Adafruit_BME280::read16(byte reg)
 
 /**************************************************************************/
 /*!
-
+    
 */
 /**************************************************************************/
 uint16_t Adafruit_BME280::read16_LE(byte reg) {
@@ -277,12 +272,12 @@ int16_t Adafruit_BME280::readS16(byte reg)
 
 /**************************************************************************/
 /*!
-
+   
 */
 /**************************************************************************/
 int16_t Adafruit_BME280::readS16_LE(byte reg)
 {
-  return (int16_t)read16_LE(reg);
+    return (int16_t)read16_LE(reg);
 }
 
 
@@ -306,7 +301,7 @@ uint32_t Adafruit_BME280::read24(byte reg)
     value |= Wire.read();
     value <<= 8;
     value |= Wire.read();
-
+    
     Wire.endTransmission();
   } else {
     // if (_sck == -1)
@@ -333,19 +328,19 @@ uint32_t Adafruit_BME280::read24(byte reg)
 */
 /**************************************************************************/
 void Adafruit_BME280::takeForcedMeasurement()
-{
-  // If we are in forced mode, the BME sensor goes back to sleep after each
-  // measurement and we need to set it to forced mode once at this point, so
-  // it will take the next measurement and then return to sleep again.
-  // In normal mode simply does new measurements periodically.
-  if (_measReg.mode == MODE_FORCED) {
-    // set to forced mode, i.e. "take next measurement"
-    write8(BME280_REGISTER_CONTROL, _measReg.get());
-    // wait until measurement has been completed, otherwise we would read
-    // the values from the last measurement
-    while (read8(BME280_REGISTER_STATUS) & 0x08)
-      delay(1);
-  }
+{   
+    // If we are in forced mode, the BME sensor goes back to sleep after each
+    // measurement and we need to set it to forced mode once at this point, so
+    // it will take the next measurement and then return to sleep again.
+    // In normal mode simply does new measurements periodically.
+    if (_measReg.mode == MODE_FORCED) {
+        // set to forced mode, i.e. "take next measurement"
+        write8(BME280_REGISTER_CONTROL, _measReg.get());
+        // wait until measurement has been completed, otherwise we would read
+        // the values from the last measurement
+        while (read8(BME280_REGISTER_STATUS) & 0x08)
+		delay(1);
+    }
 }
 
 
