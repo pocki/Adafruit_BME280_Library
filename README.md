@@ -35,6 +35,7 @@ Version History
 * [V_1.0.4](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.0.4.particle) - October 2015 pull from Adafruit repo to support multiple sensors with different calibration values
 * [V_1.1.2](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.1.2.particle) - January 2017 migrated to V2 library, pulled minor changes
 * [V_1.1.3](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.1.3.particle) - February 2017 improved documentation
+* [V_1.1.4](https://github.com/mhaack/Adafruit_BME280_Library/releases/tag/1.1.4.particle) - July 2017 pulled latest changes from Adafruit
 
 License Information
 -------------------
