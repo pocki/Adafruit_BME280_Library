@@ -21,6 +21,8 @@ Check out the links above for our tutorials and wiring diagrams
 Written by Limor Fried/Ladyada for Adafruit Industries.  
 BSD license, all text above must be included in any redistribution
 
+Adapted for Particle ecosystem by [Markus Haack](https://github.com/mhaack)
+
 To download. click the DOWNLOAD ZIP button, rename the uncompressed folder Adafruit_BME280. 
 Check that the Adafruit_BME280 folder contains Adafruit_BME280.cpp and Adafruit_BME280.h
 
