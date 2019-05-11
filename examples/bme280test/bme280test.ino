@@ -5,11 +5,7 @@
   ----> http://www.adafruit.com/products/2650
 
   These sensors use I2C or SPI to communicate, 2 or 4 pins are required
-  to interface.
-
-  Hint: the default I2C address used by the library is (0x77), as in
-  Adafruit_BME280.h. If you sensor board uses a different address you
-  can set your own via the .begin(...) method.
+  to interface. The device's I2C address is either 0x76 or 0x77.
 
   Adafruit invests time and resources providing this open source code,
   please support Adafruit andopen-source hardware by purchasing products
@@ -17,13 +13,13 @@
 
   Written by Limor Fried & Kevin Townsend for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
-
-  This file was modified by Markus Haack (https://github.com/mhaack)
-  in order to work with Particle Photon & Core.
+  See the LICENSE file for details.
  ***************************************************************************/
 
-#include "Adafruit_Sensor.h"
-#include "Adafruit_BME280.h"
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 #define BME_SCK D4
 #define BME_MISO D3
@@ -34,20 +30,49 @@
 
 Adafruit_BME280 bme; // I2C
 //Adafruit_BME280 bme(BME_CS); // hardware SPI
-//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO,  BME_SCK);
+//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
-void setup() {
-  Serial.begin(9600);
-  Serial.println(F("BME280 test"));
+unsigned long delayTime;
 
-  // if (!bme.begin(0x76)) {
-  if (!bme.begin()) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
+void setup()
+{
+    Serial.begin(9600);
+    while (!Serial)
+        ; // time to get serial running
+    Serial.println(F("BME280 test"));
+
+    unsigned status;
+
+    // default settings
+    // (you can also pass in a Wire library object like &Wire2)
+    status = bme.begin();
+    if (!status)
+    {
+        Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+        Serial.print("SensorID was: 0x");
+        Serial.println(bme.sensorID(), 16);
+        Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+        Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+        Serial.print("        ID of 0x60 represents a BME 280.\n");
+        Serial.print("        ID of 0x61 represents a BME 680.\n");
+        while (1)
+            ;
+    }
+
+    Serial.println("-- Default Test --");
+    delayTime = 1000;
+
+    Serial.println();
 }
 
-void loop() {
+void loop()
+{
+    printValues();
+    delay(delayTime);
+}
+
+void printValues()
+{
     Serial.print("Temperature = ");
     Serial.print(bme.readTemperature());
     Serial.println(" *C");
@@ -66,5 +91,4 @@ void loop() {
     Serial.println(" %");
 
     Serial.println();
-    delay(2000);
 }
