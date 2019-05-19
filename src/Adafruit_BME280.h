@@ -201,8 +201,6 @@ class Adafruit_BME280 {
     
         // constructors
         Adafruit_BME280(void);
-        Adafruit_BME280(int8_t cspin);
-        Adafruit_BME280(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin);
 		
 		bool begin(void);
 		bool begin(TwoWire *theWire);
@@ -244,11 +242,6 @@ class Adafruit_BME280 {
         uint8_t   _i2caddr; //!< I2C addr for the TwoWire interface
         int32_t   _sensorID; //!< ID of the BME Sensor
         int32_t   t_fine; //!< temperature with high resolution, stored as an attribute as this is used for temperature compensation reading humidity and pressure
-
-        int8_t _cs;   //!< for the SPI interface
-        int8_t _mosi; //!< for the SPI interface
-        int8_t _miso; //!< for the SPI interface
-        int8_t _sck;  //!< for the SPI interface
 
         bme280_calib_data _bme280_calib; //!< here calibration data is stored
 

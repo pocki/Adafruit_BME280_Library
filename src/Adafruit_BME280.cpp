@@ -30,7 +30,6 @@
 
 #include "Arduino.h"
 #include <Wire.h>
-#include <SPI.h>
 #include "Adafruit_BME280.h"
 
 /**************************************************************************/
@@ -39,32 +38,7 @@
 */
 /**************************************************************************/
 Adafruit_BME280::Adafruit_BME280()
-    : _cs(-1), _mosi(-1), _miso(-1), _sck(-1)
 { }
-
-/**************************************************************************/
-/*! 
-    @brief  class constructor if using hardware SPI
-    @param cspin the chip select pin to use
-*/
-/**************************************************************************/
-Adafruit_BME280::Adafruit_BME280(int8_t cspin)
-    : _cs(cspin), _mosi(-1), _miso(-1), _sck(-1)
-{ }
-
-/**************************************************************************/
-/*! 
-    @brief  class constructor if using software SPI
-    @param cspin the chip select pin to use
-    @param mosipin the MOSI pin to use
-    @param misopin the MISO pin to use
-    @param sckpin the SCK pin to use
-*/
-/**************************************************************************/
-Adafruit_BME280::Adafruit_BME280(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin)
-    : _cs(cspin), _mosi(mosipin), _miso(misopin), _sck(sckpin)
-{ }
-
 
 /**************************************************************************/
 /*!
@@ -137,22 +111,8 @@ bool Adafruit_BME280::begin(void)
 bool Adafruit_BME280::init()
 {
     // init I2C or SPI sensor interface
-    if (_cs == -1) {
         // I2C
         _wire -> begin();
-    } else {
-        digitalWrite(_cs, HIGH);
-        pinMode(_cs, OUTPUT);
-        if (_sck == -1) {
-            // hardware SPI
-            SPI.begin();
-        } else {
-            // software SPI
-            pinMode(_sck, OUTPUT);
-            pinMode(_mosi, OUTPUT);
-            pinMode(_miso, INPUT);
-        }
-    }
 
     // check if sensor, i.e. the chip ID is correct
     _sensorID = read8(BME280_REGISTER_CHIPID);
@@ -219,53 +179,16 @@ void Adafruit_BME280::setSampling(sensor_mode       mode,
 
 /**************************************************************************/
 /*!
-    @brief  Encapsulate hardware and software SPI transfer into one function
-    @param x the data byte to transfer
-    @returns the data byte read from the device
-*/
-/**************************************************************************/
-uint8_t Adafruit_BME280::spixfer(uint8_t x) {
-    // hardware SPI
-    if (_sck == -1)
-        return SPI.transfer(x);
-
-    // software SPI
-    uint8_t reply = 0;
-    for (int i=7; i>=0; i--) {
-        reply <<= 1;
-        digitalWrite(_sck, LOW);
-        digitalWrite(_mosi, x & (1<<i));
-        digitalWrite(_sck, HIGH);
-        if (digitalRead(_miso))
-            reply |= 1;
-        }
-    return reply;
-}
-
-
-/**************************************************************************/
-/*!
     @brief  Writes an 8 bit value over I2C or SPI
     @param reg the register address to write to
     @param value the value to write to the register
 */
 /**************************************************************************/
 void Adafruit_BME280::write8(byte reg, byte value) {
-    if (_cs == -1) {
         _wire -> beginTransmission((uint8_t)_i2caddr);
         _wire -> write((uint8_t)reg);
         _wire -> write((uint8_t)value);
         _wire -> endTransmission();
-    } else {
-        if (_sck == -1)
-            SPI.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0));
-        digitalWrite(_cs, LOW);
-        spixfer(reg & ~0x80); // write, bit 7 low
-        spixfer(value);
-        digitalWrite(_cs, HIGH);
-    if (_sck == -1)
-        SPI.endTransaction(); // release the SPI bus
-    }
 }
 
 
@@ -279,22 +202,11 @@ void Adafruit_BME280::write8(byte reg, byte value) {
 uint8_t Adafruit_BME280::read8(byte reg) {
     uint8_t value;
     
-    if (_cs == -1) {
         _wire -> beginTransmission((uint8_t)_i2caddr);
         _wire -> write((uint8_t)reg);
         _wire -> endTransmission();
         _wire -> requestFrom((uint8_t)_i2caddr, (byte)1);
         value = _wire -> read();
-    } else {
-        if (_sck == -1)
-            SPI.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0));
-        digitalWrite(_cs, LOW);
-        spixfer(reg | 0x80); // read, bit 7 high
-        value = spixfer(0);
-        digitalWrite(_cs, HIGH);
-        if (_sck == -1)
-            SPI.endTransaction(); // release the SPI bus
-    }
     return value;
 }
 
@@ -310,22 +222,11 @@ uint16_t Adafruit_BME280::read16(byte reg)
 {
     uint16_t value;
 
-    if (_cs == -1) {
         _wire -> beginTransmission((uint8_t)_i2caddr);
         _wire -> write((uint8_t)reg);
         _wire -> endTransmission();
         _wire -> requestFrom((uint8_t)_i2caddr, (byte)2);
         value = (_wire -> read() << 8) | _wire -> read();
-    } else {
-        if (_sck == -1)
-            SPI.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0));
-        digitalWrite(_cs, LOW);
-        spixfer(reg | 0x80); // read, bit 7 high
-        value = (spixfer(0) << 8) | spixfer(0);
-        digitalWrite(_cs, HIGH);
-        if (_sck == -1)
-            SPI.endTransaction(); // release the SPI bus
-    }
 
     return value;
 }
@@ -381,7 +282,6 @@ uint32_t Adafruit_BME280::read24(byte reg)
 {
     uint32_t value;
 
-    if (_cs == -1) {
         _wire -> beginTransmission((uint8_t)_i2caddr);
         _wire -> write((uint8_t)reg);
         _wire -> endTransmission();
@@ -392,23 +292,6 @@ uint32_t Adafruit_BME280::read24(byte reg)
         value |= _wire -> read();
         value <<= 8;
         value |= _wire -> read();
-    } else {
-        if (_sck == -1)
-            SPI.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0));
-        digitalWrite(_cs, LOW);
-        spixfer(reg | 0x80); // read, bit 7 high
-
-        value = spixfer(0);
-        value <<= 8;
-        value |= spixfer(0);
-        value <<= 8;
-        value |= spixfer(0);
-
-        digitalWrite(_cs, HIGH);
-        if (_sck == -1)
-            SPI.endTransaction(); // release the SPI bus
-    }
-
     return value;
 }
 
